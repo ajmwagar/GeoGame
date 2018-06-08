@@ -1,0 +1,3 @@
+[console_scripts]
+GeoGame = GeoGame.__main__:main
+
