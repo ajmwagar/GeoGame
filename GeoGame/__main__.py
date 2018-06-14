@@ -2,6 +2,7 @@
 import sys
 import pygame
 from pygame.locals import *
+import os
 
 # define some colors (R, G, B)
 WHITE = (255, 255, 255)
@@ -48,7 +49,7 @@ class Game:
         pygame.init()
 
         # Setup screen
-        self.bg = "~/.local/share//GeoGame/resources/board.png"
+        self.bg = os.environ['HOME'] + "/.local/share/GeoGame/resources/board.png"
 
         # Init game
         self.audio = Audio()
@@ -182,7 +183,7 @@ class Graphics:
         self.window_size = 600
         self.screen = pygame.display.set_mode(
             (self.window_size, self.window_size))
-        self.background = pygame.image.load('~/.local/share//GeoGame/resources/board.png')
+        self.background = pygame.image.load( os.environ['HOME']+ '/.local/share/GeoGame/resources/board.png')
 
         self.square_size = self.window_size / 8
         self.piece_size = self.square_size / 2
@@ -516,7 +517,7 @@ class Square:
 
 class Audio:
     def __init__(self):
-        pygame.mixer.music.load("/.local/share//GeoGame/resources/soundtrack.mp3")
+        pygame.mixer.music.load( os. environ['HOME']+ "/.local/share/GeoGame/resources/soundtrack.mp3")
 
     def start(self):
         pygame.mixer.music.play()
