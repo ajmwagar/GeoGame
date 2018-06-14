@@ -201,7 +201,7 @@ class Graphics:
         """
         This updates the current display.
         """
-        self.screen.blit(self.background, (0, 0))
+        self.screen.blit(pygame.transform.scale(self.background, (self.window_size, self.window_size )), (0, 0))
 
         self.highlight_squares(legal_moves, selected_piece)
         self.draw_board_pieces(board)
