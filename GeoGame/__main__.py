@@ -35,6 +35,7 @@ SOUTHEAST = "southeast"
 WIDTH = 600
 HEIGHT = 600
 FPS = 60
+DEBUG = True
 BGCOLOR = BLACK
 
 
@@ -208,6 +209,10 @@ class Graphics:
             self.screen.blit(self.text_surface_obj, self.text_rect_obj)
 
         pygame.display.update()
+
+        if DEBUG:
+            self.fps_test()
+
         self.clock.tick(FPS)
 
     def draw_board_squares(self, board):
@@ -515,6 +520,12 @@ class Audio:
 
     def start(self):
         pygame.mixer.music.play()
+
+class Ai:
+    def __init__(self, board):
+        self.board = board
+
+    def calculate_move(self):
 
 
 def main():
