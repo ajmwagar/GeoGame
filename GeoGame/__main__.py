@@ -526,6 +526,7 @@ class Ai:
         self.board = board
 
     def calculate_move(self):
+        print("WIP")
 
 
 def main():
