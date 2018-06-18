@@ -34,6 +34,7 @@ SOUTHWEST = "southwest"
 SOUTHEAST = "southeast"
 
 # basic constants to set up your game
+ATTACK_ADVANTAGE = 3
 WIDTH = 600
 HEIGHT = 600
 FPS = 60
@@ -49,6 +50,8 @@ def main():
     args = sys.argv[1:]
 
     for arg in args:
+        if (arg == "-r" or arg == "--rules"):
+            print("Welcome to GeoGame (Working Title)\n\n A probability game of checkers.\nIt's normal checkers with a twist. When you jump another piece the game roles 3 dice for each player. Who ever has the highest sum wins and takes the Opponents peice.\nAlso if the defending piece is a king and the attacking peice is a pawn the king has a three point advantage.")
         if (arg == "-a" or arg == "--ai"):
             Ops.AI = True
         if (arg == "--debug"):
@@ -142,8 +145,18 @@ class Game:
                         self.selected_piece = self.mouse_pos
 
     def fight(self):
-        currentRoll = self.roll(3, 20)
+        # Advantage for attack = 3
+        currentRoll = self.roll(3, 20) + ATTACK_ADVANTAGE
         oppRoll = self.roll(3, 20)
+
+        # Defending king vs attacking pawn gets atvantage on def.
+        defender = self.board.matrix[self.selected_piece[0] + (self.mouse_pos[0] - self.selected_piece[0]) / 2][ self.selected_piece[1] + (self.mouse_pos[1] - self.selected_piece[1]) / 2].occupant
+        attacker = self.board.matrix[self.mouse_pos[0]][self.mouse_pos[1]].occupant
+
+        if ((defender != None and defender.king == True) and (attacker != None and attacker.king == False)):
+                print("+3 King defending Advantage")
+                oppRoll += 3
+
 
         self.graphics.draw_message("You: " + str( currentRoll) + " vs. " + "Opponent: " + str(oppRoll))
 
@@ -158,7 +171,7 @@ class Game:
             print("Win")
         elif currentRoll == oppRoll:
             print("Retry")
-            fight()
+            self.fight()
         else:
             print("Lose")
             self.board.remove_piece((self.mouse_pos[0], self.mouse_pos[1]))
