@@ -1,6 +1,7 @@
 # initialize pygame
 import sys
 import pygame
+import random
 from pygame.locals import *
 import os
 
@@ -122,11 +123,7 @@ class Game:
                             self.selected_piece, self.mouse_pos)
 
                         if self.mouse_pos not in self.board.adjacent(self.selected_piece):
-                            self.board.remove_piece((self.selected_piece[0] + (
-                                self.mouse_pos[0] - self.selected_piece[0]) / 2, self.selected_piece[1] + (self.mouse_pos[1] - self.selected_piece[1]) / 2))
-
-                            self.hop = True
-                            self.selected_piece = self.mouse_pos
+                            self.fight()
 
                         else:
                             self.end_turn()
@@ -143,6 +140,34 @@ class Game:
 
                     else:
                         self.selected_piece = self.mouse_pos
+
+    def fight(self):
+        currentRoll = self.roll(3, 20)
+        oppRoll = self.roll(3, 20)
+
+        self.graphics.draw_message("You: " + str( currentRoll) + " vs. " + "Opponent: " + str(oppRoll))
+
+        if currentRoll > oppRoll:
+
+            # Hop over peice TODO implement probabillity
+            self.board.remove_piece((self.selected_piece[0] + (
+                self.mouse_pos[0] - self.selected_piece[0]) / 2, self.selected_piece[1] + (self.mouse_pos[1] - self.selected_piece[1]) / 2))
+
+            self.hop = True
+            self.selected_piece = self.mouse_pos
+            print("Win")
+        elif currentRoll == oppRoll:
+            print("Retry")
+            fight()
+        else:
+            print("Lose")
+            self.board.remove_piece((self.mouse_pos[0], self.mouse_pos[1]))
+            self.end_turn()
+    def roll(self, times, sides):
+        roll = 0
+        for i in xrange(times):
+            roll += random.randint(1, 20)
+        return roll
 
     def update(self):
         """Calls on the graphics class to update the game display."""
@@ -299,7 +324,7 @@ class Graphics:
             message, True, HIGH, BLACK)
         self.text_rect_obj = self.text_surface_obj.get_rect()
         self.text_rect_obj.center = (
-            self.window_size / 2, self.window_size / 2)
+            self.window_size / 2, self.window_size * 0.9)
 
     def fps_test(self):
         self.draw_message("FPS: " + str(int(self.clock.get_fps())))
@@ -552,6 +577,7 @@ class Ai:
     def __init__(self, board, game):
         self.board = board
         self.game = game
+
     def getScore(self):
         score = 0
         for x in range(len(self.board.matrix)):
@@ -571,6 +597,7 @@ class Ai:
                         score -= 1
 
         return score
+
     def getBestMove(self):
         for x in range(len(self.board.matrix)):
             for y in range(len(self.board.matrix[x])):
@@ -580,13 +607,8 @@ class Ai:
 
                     legal = self.board.legal_moves()
 
-
-
-
     def calculate_move(self):
         print("WIP")
-
-
 
 
 if __name__ == "__main__":
