@@ -36,8 +36,28 @@ SOUTHEAST = "southeast"
 WIDTH = 600
 HEIGHT = 600
 FPS = 60
-DEBUG = True
 BGCOLOR = BLACK
+
+
+class Ops:
+    DEBUG = False
+    AI = False
+
+
+def main():
+    args = sys.argv[1:]
+
+    for arg in args:
+        if (arg == "-a" or arg == "--ai"):
+            Ops.AI = True
+        if (arg == "--debug"):
+            Ops.DEBUG = True
+
+            # print('passed argument :: {}'.format(arg))
+
+    game = Game()
+
+    game.main()
 
 
 class Game:
@@ -49,7 +69,8 @@ class Game:
         pygame.init()
 
         # Setup screen
-        self.bg = os.environ['HOME'] + "/.local/share/GeoGame/resources/board.png"
+        self.bg = os.environ['HOME'] + \
+            "/.local/share/GeoGame/resources/board.png"
 
         # Init game
         self.audio = Audio()
@@ -67,7 +88,7 @@ class Game:
 
     def event_loop(self):
         """
-        The event loop. This is where events are triggered 
+        The event loop. This is where events are triggered
         (like a mouse click) and then effect the game state.
         """
         self.mouse_pos = self.graphics.board_coords(
@@ -78,12 +99,14 @@ class Game:
 
         for event in pygame.event.get():
 
+            if Ops.AI:
+                self.AI = Ai(self.board, self)
+                print(self.AI.getScore())
             # if event.type == pygame.KEYDOWN:
                 # if event.key == pygame.:
                 #     self.main()
                 # if event.key == pygame.q:
                 #     self.terminate_game()
-
 
             if event.type == QUIT:
                 self.terminate_game()
@@ -142,7 +165,7 @@ class Game:
 
     def end_turn(self):
         """
-        End the turn. Switches the current player. 
+        End the turn. Switches the current player.
         end_turn() also checks for and game and resets a lot of class attributes.
         """
         if self.turn == CYAN:
@@ -183,7 +206,8 @@ class Graphics:
         self.window_size = 600
         self.screen = pygame.display.set_mode(
             (self.window_size, self.window_size))
-        self.background = pygame.image.load( os.environ['HOME']+ '/.local/share/GeoGame/resources/board.png')
+        self.background = pygame.image.load(
+            os.environ['HOME'] + '/.local/share/GeoGame/resources/board.png')
 
         self.square_size = self.window_size / 8
         self.piece_size = self.square_size / 2
@@ -211,7 +235,7 @@ class Graphics:
 
         pygame.display.update()
 
-        if DEBUG:
+        if Ops.DEBUG:
             self.fps_test()
 
         self.clock.tick(FPS)
@@ -241,7 +265,7 @@ class Graphics:
 
     def pixel_coords(self, board_coords):
         """
-        Takes in a tuple of board coordinates (x,y) 
+        Takes in a tuple of board coordinates (x,y)
         and returns the pixel coordinates of the center of the square at that location.
         """
         return (board_coords[0] * self.square_size + self.piece_size, board_coords[1] * self.square_size + self.piece_size)
@@ -254,7 +278,7 @@ class Graphics:
 
     def highlight_squares(self, squares, origin):
         """
-        Squares is a list of board coordinates. 
+        Squares is a list of board coordinates.
         highlight_squares highlights them.
         """
         for square in squares:
@@ -267,7 +291,7 @@ class Graphics:
 
     def draw_message(self, message):
         """
-        Draws message to the screen. 
+        Draws message to the screen.
         """
         self.message = True
         self.font_obj = pygame.font.Font('freesansbold.ttf', 44)
@@ -385,7 +409,7 @@ class Board:
 
     def blind_legal_moves(self, (x, y)):
         """
-        Returns a list of blind legal move locations from a set of coordinates (x,y) on the board. 
+        Returns a list of blind legal move locations from a set of coordinates (x,y) on the board.
         If that location is empty, then blind_legal_moves() return an empty list.
         """
 
@@ -457,7 +481,7 @@ class Board:
 
     def is_end_square(self, coords):
         """
-        Is passed a coordinate tuple (x,y), and returns true or 
+        Is passed a coordinate tuple (x,y), and returns true or
         false depending on if that square on the board is an end square.
         ===DOCTESTS===
         >>> board = Board()
@@ -517,23 +541,59 @@ class Square:
 
 class Audio:
     def __init__(self):
-        pygame.mixer.music.load( os. environ['HOME']+ "/.local/share/GeoGame/resources/soundtrack.mp3")
+        pygame.mixer.music.load(
+            os. environ['HOME'] + "/.local/share/GeoGame/resources/soundtrack.mp3")
 
     def start(self):
         pygame.mixer.music.play()
 
+
 class Ai:
-    def __init__(self, board):
+    def __init__(self, board, game):
         self.board = board
+        self.game = game
+    def getScore(self):
+        score = 0
+        for x in range(len(self.board.matrix)):
+            for y in range(len(self.board.matrix[x])):
+                if self.board.matrix[x][y].occupant != None:
+                    if self.board.matrix[x][y].occupant.color == RED and self.board.matrix[x][y].occupant.king == True:
+                        # print("+3")
+                        score += 3
+                    elif self.board.matrix[x][y].occupant.color == RED:
+                        # print("+1")
+                        score += 1
+                    elif self.board.matrix[x][y].occupant.color == CYAN and self.board.matrix[x][y].occupant.king == True:
+                        # print("-3")
+                        score -= 3
+                    elif self.board.matrix[x][y].occupant.color == CYAN:
+                        # print("-1")
+                        score -= 1
+
+        return score
+    def getBestMove(self):
+        for x in range(len(self.board.matrix)):
+            for y in range(len(self.board.matrix[x])):
+                new_board = self.board
+                if self.board.matrix[x][y].occupant != None:
+                    selected_piece = self.board.matrix[x][y].occupant
+
+                    legal = self.board.legal_moves()
+
+
+
 
     def calculate_move(self):
         print("WIP")
 
 
-def main():
-    game = Game()
-    game.main()
 
+
+if __name__ == "__main__":
+    main()
+
+if __name__ == "__main__":
+    main()
 
 if __name__ == "__main__":
     main()
